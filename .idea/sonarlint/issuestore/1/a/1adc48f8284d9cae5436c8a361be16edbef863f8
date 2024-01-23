@@ -1,0 +1,10 @@
+
+t
+java:S3776"RRefactor this method to reduce its Cognitive Complexity from 33 to the 15 allowed.( î†úÿÿÿÿ8ò—ù¶Ó1
+T
+java:S1135 "2Complete the task associated to this TODO comment.(Ùß½“ıÿÿÿÿ8¾¼î¼Ó1
+X	java:S125C"<This block of commented-out lines of code should be removed.(õ Øİ8ƒ°Ÿ½Ó1
+L	java:S106J"+Replace this use of System.out by a logger.(êÊ¨ÿÿÿÿÿ8¬õÉ¼Ó1
+G	java:S106W"+Replace this use of System.out by a logger.(ï³Œç8Š–Ê¼Ó1
+]	java:S125b"<This block of commented-out lines of code should be removed.(ñ¥ùšøÿÿÿÿ8ùÛŸ½Ó1
+G	java:S106’"+Replace this use of System.out by a logger.(•œ£=8×ÊÊ¼Ó1
