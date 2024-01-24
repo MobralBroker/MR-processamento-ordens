@@ -47,3 +47,5 @@ Y
 ).github/workflows/sonarcloud-analysis.yml,d/c/dcb345a1fb288b1c468ac7baef42179476b19c46
 H
 sonar-project.properties,2/5/2538046035efb77ecc44e1fd2eec1e2641594d4c
+~
+Nsrc/main/java/com/solinfbroker/msprocessamento/MsProcessamentoApplication.java,3/0/30fb526cbc7f4226c02f35559a26a1381682df54
