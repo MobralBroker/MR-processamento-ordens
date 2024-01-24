@@ -21,6 +21,8 @@ public record OrdemDTO(
         @Column(name = "valor_ordem", nullable = false)
         @Min(1)
         double valorOrdem,
+        @Column(name = "valor_cliente_bloqueado", nullable = false)
+        double valorClienteBloqueado,
 
         @Column(name = "quantidade_ordem", nullable = false)
         @Min(1)
