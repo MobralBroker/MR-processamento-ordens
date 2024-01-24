@@ -32,6 +32,9 @@ public class Operacao {
     @Column(name = "data_execucao",nullable = false)
     private LocalDateTime dataExecucao;
 
+    @Column(name = "valor_ativo_execucao",nullable = false)
+    private double valorAtivoExecucao;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status_operacao",nullable = false)
     private enumStatus statusOperacao;

@@ -41,6 +41,9 @@ public class Ordem {
     @Min(1)
     private double valorOrdem;
 
+    @Column(name = "valor_cliente_bloqueado", nullable = false)
+    private double valorClienteBloqueado;
+
     @Column(name = "data_lancamento", nullable = false)
     private LocalDateTime dataLancamento;
 

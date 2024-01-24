@@ -21,6 +21,9 @@ public class OrdemKafka {
     @JsonProperty("valor_ordem")
     double valorOrdem;
 
+    @JsonProperty("valor_cliente_bloqueado")
+    double valorClienteBloqueado;
+
     @JsonProperty("quantidade_ordem")
     Integer quantidadeOrdem;
 
@@ -38,5 +41,7 @@ public class OrdemKafka {
 
     @JsonProperty("__op")
     String operacao;
+
+
 
 }
