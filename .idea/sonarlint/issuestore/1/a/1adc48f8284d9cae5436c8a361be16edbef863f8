@@ -1,0 +1,20 @@
+
+x
+java:S3655Á"ZCall "clienteCompra.isPresent()" or "!clienteCompra.isEmpty()" before accessing the value.(¥¨åÀ8æÃœÛÓ1
+{
+java:S3655Ò"XCall "clienteVenda.isPresent()" or "!clienteVenda.isEmpty()" before accessing the value.(­Ì•øÿÿÿÿ8åÃœÛÓ1
+t
+java:S3776"RRefactor this method to reduce its Cognitive Complexity from 33 to the 15 allowed.( î†úÿÿÿÿ8ìÃœÛÓ1
+O
+java:S1135#"2Complete the task associated to this TODO comment.(§åò‘8ğÃœÛÓ1
+X	java:S125K"<This block of commented-out lines of code should be removed.(õ Øİ8öÃœÛÓ1
+L	java:S106R"+Replace this use of System.out by a logger.(êÊ¨ÿÿÿÿÿ8÷ÃœÛÓ1
+t
+java:S3776\"RRefactor this method to reduce its Cognitive Complexity from 33 to the 15 allowed.(¾¾¹ÿÿÿÿÿ8øÃœÛÓ1
+O
+java:S1135c"2Complete the task associated to this TODO comment.(±ÿä8ûÃœÛÓ1
+Y	java:S125Œ"<This block of commented-out lines of code should be removed.(õ Øİ8ÄœÛÓ1
+M	java:S106“"+Replace this use of System.out by a logger.(ğ¢öøÿÿÿÿ8ÄœÛÓ1
+^	java:S125 "<This block of commented-out lines of code should be removed.(®ƒø¯ûÿÿÿÿ8ƒÄœÛÓ1
+^	java:S125¥"<This block of commented-out lines of code should be removed.(ñ¥ùšøÿÿÿÿ8ƒÄœÛÓ1
+G	java:S106ê"+Replace this use of System.out by a logger.(•œ£=8‘ÄœÛÓ1
