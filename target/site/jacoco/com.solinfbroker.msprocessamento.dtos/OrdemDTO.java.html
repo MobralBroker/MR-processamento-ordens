@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrdemDTO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-processamento</a> &gt; <a href="index.source.html" class="el_package">com.solinfbroker.msprocessamento.dtos</a> &gt; <span class="el_source">OrdemDTO.java</span></div><h1>OrdemDTO.java</h1><pre class="source lang-java linenums">package com.solinfbroker.msprocessamento.dtos;
+
+import com.solinfbroker.msprocessamento.model.enumTipoOrdem;
+import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.validation.constraints.Min;
+
+<span class="nc" id="L9">public record OrdemDTO(</span>
+
+        @Column(name = &quot;id_cliente&quot;, nullable = false)
+        Long idCliente,
+
+        @Column(name = &quot;id_ativo&quot;, nullable = false)
+        Long idAtivo,
+
+        @Column(name = &quot;tipo_ordem&quot;, nullable = false, length = 12)
+        @Enumerated(EnumType.STRING)
+        enumTipoOrdem tipoOrdem,
+
+        @Column(name = &quot;valor_ordem&quot;, nullable = false)
+        @Min(1)
+        double valorOrdem,
+        @Column(name = &quot;valor_cliente_bloqueado&quot;, nullable = false)
+        double valorClienteBloqueado,
+
+        @Column(name = &quot;quantidade_ordem&quot;, nullable = false)
+        @Min(1)
+        Integer quantidadeOrdem
+
+) {
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

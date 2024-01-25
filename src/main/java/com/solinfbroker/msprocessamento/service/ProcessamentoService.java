@@ -32,7 +32,7 @@ public class ProcessamentoService {
             if(ordemCompra.isPresent() && !ordensVendasAbertas.isEmpty()){
                 for (Ordem ordensVendasAberta : ordensVendasAbertas) { //Adicionar esta validação no if abaixo || ordemCompra.get().getCliente().getId() == ordensVendasAberta.getId()
                     Operacao operacao = new Operacao();
-                    if (ordemCompra.get().getStatusOrdem().equals(enumStatus.EXECUTADA) || ordemCompra.get().getValorOrdem() < ordensVendasAberta.getValorOrdem()) { //TODO tratar quando o valor da ordem de compra for menor que a ordem de venda
+                    if (ordemCompra.get().getStatusOrdem().equals(enumStatus.EXECUTADA) || ordemCompra.get().getValorOrdem() < ordensVendasAberta.getValorOrdem()) {
                         return;
                     }
 
@@ -72,14 +72,8 @@ public class ProcessamentoService {
                     operacao.setDataExecucao(LocalDateTime.now());
                     operacao.setStatusOperacao(enumStatus.EXECUTADA);
 
-//                        if(indexControle < 3){
-//                            criarConcorrencia(ordemCompra.get().getId());
-//                            System.out.println("Criar concorrencia : "+indexControle);
-//                        }
-
                     indexControle = salvarDados(ordemCompra.get(),ordensVendasAberta,operacao,indexControle);
 
-                    System.out.println("ORDEM EXECUTADA");
 
                 }
             }else {
@@ -96,13 +90,14 @@ public class ProcessamentoService {
             List<Ordem> ordensCompraAbertaList = ordemRepository.findOrdemAbertaCompra();
             if(ordemVenda.isPresent() && !ordensCompraAbertaList.isEmpty()){
                 for (Ordem ordensCompraAberta : ordensCompraAbertaList) { //Adicionar esta validação no if abaixo || ordemCompra.get().getCliente().getId() == ordensVendasAberta.getId()
-                    if (ordemVenda.get().getStatusOrdem().equals(enumStatus.EXECUTADA) || ordemVenda.get().getValorOrdem() > ordensCompraAberta.getValorOrdem()) { //TODO tratar quando o valor da ordem de compra for menor que a ordem de venda
+                    if (ordemVenda.get().getStatusOrdem().equals(enumStatus.EXECUTADA) || ordemVenda.get().getValorOrdem() > ordensCompraAberta.getValorOrdem()) {
                         return;
                     }
 
                     Operacao operacao = new Operacao();
 
                     //Verificar qual é a quantidade que irá utilizar
+
                     if (ordensCompraAberta.getQuantidadeAberto() <= ordemVenda.get().getQuantidadeAberto()) {
                         operacao.setQuantidade(ordensCompraAberta.getQuantidadeAberto());
                         ordemVenda.get().setQuantidadeAberto(ordemVenda.get().getQuantidadeAberto() - ordensCompraAberta.getQuantidadeAberto()); //atualiza a quantidade da ordem de compra
@@ -137,14 +132,7 @@ public class ProcessamentoService {
                     operacao.setDataExecucao(LocalDateTime.now());
                     operacao.setStatusOperacao(enumStatus.EXECUTADA);
 
-//                        if(indexControle < 3){
-//                            criarConcorrencia(ordemCompra.get().getId());
-//                            System.out.println("Criar concorrencia : "+indexControle);
-//                        }
-
                     indexControle = salvarDados(ordensCompraAberta,ordemVenda.get(),operacao,indexControle);
-
-                    System.out.println("ORDEM EXECUTADA VENDA");
 
                 }
             }else {
@@ -157,16 +145,6 @@ public class ProcessamentoService {
 
     public Integer salvarDados(Ordem ordemCompra, Ordem ordemVenda, Operacao operacao, int indexControle){
         try {
-//            if (clienteModel.isPresent()) {
-//                clienteModel.get().setValorBloqueado(clienteModel.get().getValorBloqueado() - (operacao.getQuantidade() * ordemCompra.getValorOrdem()));
-//                clienteRepository.save(clienteModel.get());
-//            }
-
-//            try {
-//                Thread.sleep(2000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
             ordemCompra = ordemRepository.save(ordemCompra);
             ordemVenda = ordemRepository.save(ordemVenda);
             operacao = operacaoRepository.save(operacao);
@@ -189,8 +167,8 @@ public class ProcessamentoService {
         if(clienteCompra.isPresent()){
             clienteCompra.get().setValorBloqueado(clienteCompra.get().getValorBloqueado() - valorBloqueado);
             clienteCompra.get().setSaldo(clienteCompra.get().getSaldo() + valorDesbloquear);
+            clienteRepository.save(clienteCompra.get());
         }
-        clienteRepository.save(clienteCompra.get());
         CarteiraModel carteiraModel = new CarteiraModel();
         carteiraModel.setQuantidade(operacao.getQuantidade());
         carteiraModel.setIdAtivo(ordemCompra.getAtivo().getId());
@@ -206,33 +184,22 @@ public class ProcessamentoService {
 
         if(clienteVenda.isPresent()){
             clienteVenda.get().setSaldo(clienteVenda.get().getSaldo() + valorVenda);
-        }
-        clienteRepository.save(clienteVenda.get());
-        Set<CarteiraModel> carteiras = carteiraRepository.findByIdAtivoAndIdClienteOrderByDataCompraAsc(ordemVenda.getAtivo().getId(),clienteVenda.get().getId());
-        if(!carteiras.isEmpty()){
-            Iterator<CarteiraModel> iter = carteiras.iterator();
-            while(iter.hasNext() && operacao.getQuantidade() > 0){
-                CarteiraModel carteiraModel = iter.next();
-                if(carteiraModel.getQuantidade() > operacao.getQuantidade()){
-                    carteiraModel.setQuantidade(carteiraModel.getQuantidade() - operacao.getQuantidade());
-                    carteiraRepository.save(carteiraModel);
-                }else{
-                    operacao.setQuantidade(operacao.getQuantidade() - carteiraModel.getQuantidade());
-                    carteiraRepository.delete(carteiraModel);
+            clienteRepository.save(clienteVenda.get());
+            Set<CarteiraModel> carteiras = carteiraRepository.findByIdAtivoAndIdClienteOrderByDataCompraAsc(ordemVenda.getAtivo().getId(),clienteVenda.get().getId());
+            if(!carteiras.isEmpty()){
+                Iterator<CarteiraModel> iter = carteiras.iterator();
+                while(iter.hasNext() && operacao.getQuantidade() > 0){
+                    CarteiraModel carteiraModel = iter.next();
+                    if(carteiraModel.getQuantidade() > operacao.getQuantidade()){
+                        carteiraModel.setQuantidade(carteiraModel.getQuantidade() - operacao.getQuantidade());
+                        carteiraRepository.save(carteiraModel);
+                    }else{
+                        operacao.setQuantidade(operacao.getQuantidade() - carteiraModel.getQuantidade());
+                        carteiraRepository.delete(carteiraModel);
+                    }
                 }
             }
         }
     }
 
-    public void criarConcorrencia(Long id){
-        new Thread(() -> {
-            Ordem ordem = ordemRepository.findById(id).get();
-            ordem.setStatusOrdem(enumStatus.CANCELADA);
-            try {
-                ordemRepository.save(ordem);
-            }catch (ObjectOptimisticLockingFailureException ex){
-                System.out.println("opa");
-            }
-        }).start();
-    }
 }
