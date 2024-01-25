@@ -49,3 +49,7 @@ H
 sonar-project.properties,2/5/2538046035efb77ecc44e1fd2eec1e2641594d4c
 ~
 Nsrc/main/java/com/solinfbroker/msprocessamento/MsProcessamentoApplication.java,3/0/30fb526cbc7f4226c02f35559a26a1381682df54
+„
+Tsrc/test/java/com/solinfbroker/msprocessamento/service/ProcessamentoServiceTest.java,5/5/5501df665516bd0aff9505fc8dcb441febe749a0
+ƒ
+Ssrc/test/java/com/solinfbroker/msprocessamento/MsProcessamentoApplicationTests.java,c/6/c648d80ce6a8c8b91b3dc1447d3956504dfa97cb
