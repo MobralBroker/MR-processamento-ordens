@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProcessamentoService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-processamento</a> &gt; <a href="index.source.html" class="el_package">com.solinfbroker.msprocessamento.service</a> &gt; <span class="el_source">ProcessamentoService.java</span></div><h1>ProcessamentoService.java</h1><pre class="source lang-java linenums">package com.solinfbroker.msprocessamento.service;
+
+import com.solinfbroker.msprocessamento.dtos.OrdemKafka;
+import com.solinfbroker.msprocessamento.model.*;
+import com.solinfbroker.msprocessamento.repository.CarteiraRepository;
+import com.solinfbroker.msprocessamento.repository.ClienteRepository;
+import com.solinfbroker.msprocessamento.repository.OperacaoRepository;
+import com.solinfbroker.msprocessamento.repository.OrdemRepository;
+import lombok.AllArgsConstructor;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+@Service
+<span class="fc" id="L20">@AllArgsConstructor</span>
+public class ProcessamentoService {
+
+    private final OrdemRepository ordemRepository;
+    private final OperacaoRepository operacaoRepository;
+    private final ClienteRepository clienteRepository;
+    private final CarteiraRepository carteiraRepository;
+    public void processarOrdemCompra(OrdemKafka ordemKafka){
+<span class="fc" id="L28">        int indexControle = 0;</span>
+<span class="fc bfc" id="L29" title="All 2 branches covered.">        while(indexControle &lt; 5 ){</span>
+<span class="fc" id="L30">            Optional&lt;Ordem&gt; ordemCompra = ordemRepository.findById(Long.valueOf(ordemKafka.getId()));</span>
+<span class="fc" id="L31">            List&lt;Ordem&gt; ordensVendasAbertas = ordemRepository.findOrdemAbertaVenda();</span>
+<span class="pc bpc" id="L32" title="1 of 4 branches missed.">            if(ordemCompra.isPresent() &amp;&amp; !ordensVendasAbertas.isEmpty()){</span>
+<span class="fc bfc" id="L33" title="All 2 branches covered.">                for (Ordem ordensVendasAberta : ordensVendasAbertas) { //Adicionar esta validação no if abaixo || ordemCompra.get().getCliente().getId() == ordensVendasAberta.getId()</span>
+<span class="fc" id="L34">                    Operacao operacao = new Operacao();</span>
+<span class="pc bpc" id="L35" title="1 of 4 branches missed.">                    if (ordemCompra.get().getStatusOrdem().equals(enumStatus.EXECUTADA) || ordemCompra.get().getValorOrdem() &lt; ordensVendasAberta.getValorOrdem()) {</span>
+<span class="fc" id="L36">                        return;</span>
+                    }
+
+
+                    //Verificar qual é a quantidade que irá utilizar
+<span class="fc bfc" id="L41" title="All 2 branches covered.">                    if (ordensVendasAberta.getQuantidadeAberto() &lt;= ordemCompra.get().getQuantidadeAberto()) {</span>
+<span class="fc" id="L42">                        operacao.setQuantidade(ordensVendasAberta.getQuantidadeAberto());</span>
+<span class="fc" id="L43">                        ordemCompra.get().setQuantidadeAberto(ordemCompra.get().getQuantidadeAberto() - ordensVendasAberta.getQuantidadeAberto()); //atualiza a quantidade da ordem de compra</span>
+<span class="fc" id="L44">                        ordensVendasAberta.setQuantidadeAberto(0);//atualiza a quantidade da ordem de venda em Aberto</span>
+                    } else {
+<span class="fc" id="L46">                        operacao.setQuantidade(ordemCompra.get().getQuantidadeAberto());</span>
+<span class="fc" id="L47">                        ordensVendasAberta.setQuantidadeAberto(ordensVendasAberta.getQuantidadeAberto() - ordemCompra.get().getQuantidadeAberto());//atualiza a quantidade da ordem de venda em Aberto</span>
+<span class="fc" id="L48">                        ordemCompra.get().setQuantidadeAberto(0); //atualiza a quantidade da ordem de compra</span>
+                    }
+
+
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">                    if (ordemCompra.get().getQuantidadeAberto() &gt; 0) {</span>
+<span class="nc" id="L53">                        ordemCompra.get().setStatusOrdem(enumStatus.EXECUTADA_PARCIAL);</span>
+                    } else {
+<span class="fc" id="L55">                        ordemCompra.get().setStatusOrdem(enumStatus.EXECUTADA);</span>
+                    }
+
+<span class="fc bfc" id="L58" title="All 2 branches covered.">                    if (ordensVendasAberta.getQuantidadeAberto() &gt; 0) {</span>
+<span class="fc" id="L59">                        ordensVendasAberta.setStatusOrdem(enumStatus.EXECUTADA_PARCIAL);</span>
+                    } else {
+<span class="fc" id="L61">                        ordensVendasAberta.setStatusOrdem(enumStatus.EXECUTADA);</span>
+                    }
+
+<span class="fc bfc" id="L64" title="All 2 branches covered.">                    if (ordemCompra.get().getValorOrdem() == ordensVendasAberta.getValorOrdem() ) {</span>
+<span class="fc" id="L65">                        operacao.setValorAtivoExecucao(ordemCompra.get().getValorOrdem());</span>
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">                    }else if(ordemCompra.get().getValorOrdem() &gt; ordensVendasAberta.getValorOrdem()){</span>
+<span class="fc" id="L67">                        operacao.setValorAtivoExecucao(ordensVendasAberta.getValorOrdem());</span>
+                    }
+
+<span class="fc" id="L70">                    operacao.setOrdemCompra(ordemCompra.get());</span>
+<span class="fc" id="L71">                    operacao.setOrdemVenda(ordensVendasAberta);</span>
+<span class="fc" id="L72">                    operacao.setDataExecucao(LocalDateTime.now());</span>
+<span class="fc" id="L73">                    operacao.setStatusOperacao(enumStatus.EXECUTADA);</span>
+
+<span class="fc" id="L75">                    indexControle = salvarDados(ordemCompra.get(),ordensVendasAberta,operacao,indexControle);</span>
+
+
+<span class="fc" id="L78">                }</span>
+            }else {
+<span class="fc" id="L80">                indexControle = 5;</span>
+            }
+
+<span class="fc" id="L83">        }</span>
+<span class="fc" id="L84">    }</span>
+
+    public void processarOrdemVenda(OrdemKafka ordemKafka){
+<span class="fc" id="L87">        int indexControle = 0;</span>
+<span class="fc bfc" id="L88" title="All 2 branches covered.">        while(indexControle &lt; 5 ){</span>
+<span class="fc" id="L89">            Optional&lt;Ordem&gt; ordemVenda = ordemRepository.findById(Long.valueOf(ordemKafka.getId()));</span>
+<span class="fc" id="L90">            List&lt;Ordem&gt; ordensCompraAbertaList = ordemRepository.findOrdemAbertaCompra();</span>
+<span class="pc bpc" id="L91" title="1 of 4 branches missed.">            if(ordemVenda.isPresent() &amp;&amp; !ordensCompraAbertaList.isEmpty()){</span>
+<span class="fc bfc" id="L92" title="All 2 branches covered.">                for (Ordem ordensCompraAberta : ordensCompraAbertaList) { //Adicionar esta validação no if abaixo || ordemCompra.get().getCliente().getId() == ordensVendasAberta.getId()</span>
+<span class="pc bpc" id="L93" title="1 of 4 branches missed.">                    if (ordemVenda.get().getStatusOrdem().equals(enumStatus.EXECUTADA) || ordemVenda.get().getValorOrdem() &gt; ordensCompraAberta.getValorOrdem()) {</span>
+<span class="fc" id="L94">                        return;</span>
+                    }
+
+<span class="fc" id="L97">                    Operacao operacao = new Operacao();</span>
+
+                    //Verificar qual é a quantidade que irá utilizar
+
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">                    if (ordensCompraAberta.getQuantidadeAberto() &lt;= ordemVenda.get().getQuantidadeAberto()) {</span>
+<span class="fc" id="L102">                        operacao.setQuantidade(ordensCompraAberta.getQuantidadeAberto());</span>
+<span class="fc" id="L103">                        ordemVenda.get().setQuantidadeAberto(ordemVenda.get().getQuantidadeAberto() - ordensCompraAberta.getQuantidadeAberto()); //atualiza a quantidade da ordem de compra</span>
+<span class="fc" id="L104">                        ordensCompraAberta.setQuantidadeAberto(0);//atualiza a quantidade da ordem de venda em Aberto</span>
+                    } else {
+<span class="nc" id="L106">                        operacao.setQuantidade(ordemVenda.get().getQuantidadeAberto());</span>
+<span class="nc" id="L107">                        ordensCompraAberta.setQuantidadeAberto(ordensCompraAberta.getQuantidadeAberto() - ordemVenda.get().getQuantidadeAberto());//atualiza a quantidade da ordem de venda em Aberto</span>
+<span class="nc" id="L108">                        ordemVenda.get().setQuantidadeAberto(0); //atualiza a quantidade da ordem de compra</span>
+                    }
+
+
+<span class="fc bfc" id="L112" title="All 2 branches covered.">                    if (ordemVenda.get().getQuantidadeAberto() &gt; 0) {</span>
+<span class="fc" id="L113">                        ordemVenda.get().setStatusOrdem(enumStatus.EXECUTADA_PARCIAL);</span>
+                    } else {
+<span class="fc" id="L115">                        ordemVenda.get().setStatusOrdem(enumStatus.EXECUTADA);</span>
+                    }
+
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">                    if (ordensCompraAberta.getQuantidadeAberto() &gt; 0) {</span>
+<span class="nc" id="L119">                        ordensCompraAberta.setStatusOrdem(enumStatus.EXECUTADA_PARCIAL);</span>
+                    } else {
+<span class="fc" id="L121">                        ordensCompraAberta.setStatusOrdem(enumStatus.EXECUTADA);</span>
+                    }
+
+<span class="fc bfc" id="L124" title="All 2 branches covered.">                    if (ordemVenda.get().getValorOrdem() == ordensCompraAberta.getValorOrdem() ) {</span>
+<span class="fc" id="L125">                        operacao.setValorAtivoExecucao(ordemVenda.get().getValorOrdem());</span>
+<span class="pc bpc" id="L126" title="1 of 2 branches missed.">                    }else if(ordemVenda.get().getValorOrdem() &lt; ordensCompraAberta.getValorOrdem()){</span>
+<span class="fc" id="L127">                        operacao.setValorAtivoExecucao(ordensCompraAberta.getValorOrdem());</span>
+                    }
+
+<span class="fc" id="L130">                    operacao.setOrdemCompra(ordensCompraAberta);</span>
+<span class="fc" id="L131">                    operacao.setOrdemVenda(ordemVenda.get());</span>
+<span class="fc" id="L132">                    operacao.setDataExecucao(LocalDateTime.now());</span>
+<span class="fc" id="L133">                    operacao.setStatusOperacao(enumStatus.EXECUTADA);</span>
+
+<span class="fc" id="L135">                    indexControle = salvarDados(ordensCompraAberta,ordemVenda.get(),operacao,indexControle);</span>
+
+<span class="fc" id="L137">                }</span>
+            }else {
+<span class="fc" id="L139">                indexControle = 5;</span>
+            }
+
+<span class="fc" id="L142">        }</span>
+<span class="fc" id="L143">    }</span>
+
+
+    public Integer salvarDados(Ordem ordemCompra, Ordem ordemVenda, Operacao operacao, int indexControle){
+        try {
+<span class="fc" id="L148">            ordemCompra = ordemRepository.save(ordemCompra);</span>
+<span class="fc" id="L149">            ordemVenda = ordemRepository.save(ordemVenda);</span>
+<span class="fc" id="L150">            operacao = operacaoRepository.save(operacao);</span>
+<span class="fc" id="L151">            adicionarPapeisCarteira(operacao, ordemCompra);</span>
+<span class="fc" id="L152">            removerPapeisCarteira(operacao,ordemVenda);</span>
+<span class="fc" id="L153">            indexControle = 5;</span>
+<span class="fc" id="L154">            return indexControle;</span>
+<span class="nc" id="L155">        }catch (ObjectOptimisticLockingFailureException e){</span>
+<span class="nc" id="L156">            indexControle = indexControle +1;</span>
+<span class="nc" id="L157">            return indexControle;</span>
+        }
+    }
+
+    public void adicionarPapeisCarteira(Operacao operacao, Ordem ordemCompra){
+<span class="fc" id="L162">        Optional&lt;ClienteModel&gt; clienteCompra = clienteRepository.findById(ordemCompra.getIdCliente());</span>
+<span class="fc" id="L163">        double valorCompra = operacao.getQuantidade() * operacao.getValorAtivoExecucao();</span>
+<span class="fc" id="L164">        double valorBloqueado = operacao.getQuantidade() * ordemCompra.getValorOrdem() ;</span>
+<span class="fc" id="L165">        double valorDesbloquear = valorBloqueado - valorCompra;</span>
+
+<span class="pc bpc" id="L167" title="1 of 2 branches missed.">        if(clienteCompra.isPresent()){</span>
+<span class="fc" id="L168">            clienteCompra.get().setValorBloqueado(clienteCompra.get().getValorBloqueado() - valorBloqueado);</span>
+<span class="fc" id="L169">            clienteCompra.get().setSaldo(clienteCompra.get().getSaldo() + valorDesbloquear);</span>
+<span class="fc" id="L170">            clienteRepository.save(clienteCompra.get());</span>
+        }
+<span class="fc" id="L172">        CarteiraModel carteiraModel = new CarteiraModel();</span>
+<span class="fc" id="L173">        carteiraModel.setQuantidade(operacao.getQuantidade());</span>
+<span class="fc" id="L174">        carteiraModel.setIdAtivo(ordemCompra.getAtivo().getId());</span>
+<span class="fc" id="L175">        carteiraModel.setIdCliente(ordemCompra.getCliente().getId());</span>
+<span class="fc" id="L176">        carteiraModel.setDataCompra(operacao.getDataExecucao());</span>
+<span class="fc" id="L177">        carteiraModel.setQuantidade(operacao.getQuantidade());</span>
+<span class="fc" id="L178">        carteiraRepository.save(carteiraModel);</span>
+<span class="fc" id="L179">    }</span>
+
+    public void removerPapeisCarteira(Operacao operacao, Ordem ordemVenda){
+<span class="fc" id="L182">        Optional&lt;ClienteModel&gt; clienteVenda = clienteRepository.findById(ordemVenda.getIdCliente());</span>
+<span class="fc" id="L183">        double valorVenda = operacao.getQuantidade() * operacao.getValorAtivoExecucao();</span>
+
+<span class="pc bpc" id="L185" title="1 of 2 branches missed.">        if(clienteVenda.isPresent()){</span>
+<span class="fc" id="L186">            clienteVenda.get().setSaldo(clienteVenda.get().getSaldo() + valorVenda);</span>
+<span class="fc" id="L187">            clienteRepository.save(clienteVenda.get());</span>
+<span class="fc" id="L188">            Set&lt;CarteiraModel&gt; carteiras = carteiraRepository.findByIdAtivoAndIdClienteOrderByDataCompraAsc(ordemVenda.getAtivo().getId(),clienteVenda.get().getId());</span>
+<span class="pc bpc" id="L189" title="1 of 2 branches missed.">            if(!carteiras.isEmpty()){</span>
+<span class="fc" id="L190">                Iterator&lt;CarteiraModel&gt; iter = carteiras.iterator();</span>
+<span class="pc bpc" id="L191" title="1 of 4 branches missed.">                while(iter.hasNext() &amp;&amp; operacao.getQuantidade() &gt; 0){</span>
+<span class="fc" id="L192">                    CarteiraModel carteiraModel = iter.next();</span>
+<span class="pc bpc" id="L193" title="1 of 2 branches missed.">                    if(carteiraModel.getQuantidade() &gt; operacao.getQuantidade()){</span>
+<span class="nc" id="L194">                        carteiraModel.setQuantidade(carteiraModel.getQuantidade() - operacao.getQuantidade());</span>
+<span class="nc" id="L195">                        carteiraRepository.save(carteiraModel);</span>
+                    }else{
+<span class="fc" id="L197">                        operacao.setQuantidade(operacao.getQuantidade() - carteiraModel.getQuantidade());</span>
+<span class="fc" id="L198">                        carteiraRepository.delete(carteiraModel);</span>
+                    }
+<span class="fc" id="L200">                }</span>
+            }
+        }
+<span class="fc" id="L203">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

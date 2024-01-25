@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClienteModel.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-processamento</a> &gt; <a href="index.source.html" class="el_package">com.solinfbroker.msprocessamento.model</a> &gt; <span class="el_source">ClienteModel.java</span></div><h1>ClienteModel.java</h1><pre class="source lang-java linenums">package com.solinfbroker.msprocessamento.model;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+/**
+ * Classe ClienteModel é uma entidade representante da tabela &quot;cliente&quot; no banco de dados.
+ * Essa classe implementa UserDetails para fornecer autenticação e autorização para os usuários.
+ *
+ * Atributos:
+ * - id: Identificador único do cliente.
+ * - tipo: Tipo de cliente.
+ * - nomeUsuario: Nome do usuário do cliente.
+ * - senha: Senha da conta do cliente.
+ * - email: Endereço de email do cliente.
+ * - saldo: Saldo atual da conta do cliente.
+ * - pessoaFisica: Conjunto de pessoas físicas associadas à conta do cliente.
+ * - pessoaJuridica: Conjunto de pessoas jurídicas associadas à conta do cliente.
+ * - permissoes: Conjunto de permissões que o cliente possui.
+ *
+ * O construtor ClientModel é usado para criar uma instância da classe com email, senha, conjunto de permissões,
+ * tipo, nome do usuário e conjuntos de pessoas físicas e jurídicas.
+ *
+ * Método getAuthorities() retorna uma coleção de autoridades concedidas ao cliente.
+ * Método getPassword() retorna a senha do cliente.
+ * Método getUsername() retorna o email do cliente.
+ * Método isAccountNonExpired() sempre retorna verdadeiro, representando que a conta é não expirada.
+ * Método isAccountNonLocked() sempre retorna verdadeiro, representando que a conta não está bloqueada.
+ * Método isCredentialsNonExpired() sempre retorna verdadeiro, representando que as credenciais são não expiradas.
+ * Método isEnabled() sempre retorna verdadeiro, representando que a conta está ativada.
+ */
+@Entity
+<span class="nc" id="L33">@Data</span>
+@Getter
+<span class="nc" id="L35">@Setter</span>
+<span class="nc bnc" id="L36" title="All 34 branches missed.">@EqualsAndHashCode</span>
+<span class="fc" id="L37">@NoArgsConstructor</span>
+<span class="nc" id="L38">@AllArgsConstructor</span>
+@Table(name = &quot;cliente&quot;)
+public class ClienteModel{
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+<span class="nc" id="L44">    private Long id;</span>
+
+    @Column(name = &quot;nome_usuario&quot;)
+<span class="nc" id="L47">    private String nomeUsuario;</span>
+
+    @Column(name = &quot;email&quot;)
+<span class="nc" id="L50">    private String email;</span>
+
+    @Column(name = &quot;saldo&quot;)
+<span class="nc" id="L53">    private double saldo;</span>
+
+    @Column(name = &quot;valor_bloqueado&quot;)
+<span class="nc" id="L56">    private double valorBloqueado;</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

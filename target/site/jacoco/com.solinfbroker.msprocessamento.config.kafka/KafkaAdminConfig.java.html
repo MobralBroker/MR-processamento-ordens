@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>KafkaAdminConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-processamento</a> &gt; <a href="index.source.html" class="el_package">com.solinfbroker.msprocessamento.config.kafka</a> &gt; <span class="el_source">KafkaAdminConfig.java</span></div><h1>KafkaAdminConfig.java</h1><pre class="source lang-java linenums">package com.solinfbroker.msprocessamento.config.kafka;
+
+
+import lombok.AllArgsConstructor;
+import org.apache.kafka.clients.admin.AdminClientConfig;
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.config.TopicBuilder;
+import org.springframework.kafka.core.KafkaAdmin;
+
+import java.util.HashMap;
+
+@Configuration
+<span class="nc" id="L15">@AllArgsConstructor</span>
+public class KafkaAdminConfig {
+
+    private final KafkaProperties properties;
+
+    @Bean
+    public KafkaAdmin kafkaAdmin() {
+<span class="nc" id="L22">        var configs = new HashMap&lt;String, Object&gt;();</span>
+<span class="nc" id="L23">        configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, properties.getBootstrapServers());</span>
+<span class="nc" id="L24">        return new KafkaAdmin(configs);</span>
+    }
+
+    @Bean
+    public KafkaAdmin.NewTopics newTopics() {
+
+<span class="nc" id="L30">        return new KafkaAdmin.NewTopics(</span>
+<span class="nc" id="L31">                TopicBuilder.name(Topicos.TOPIC_ATUALIZACAO_MERCADO).partitions(1).build(),</span>
+<span class="nc" id="L32">                TopicBuilder.name(Topicos.TOPIC_CHECK_SAUDE).partitions(1).build(),</span>
+<span class="nc" id="L33">                TopicBuilder.name(Topicos.TOPIC_INFO_USUARIO).partitions(1).build(),</span>
+<span class="nc" id="L34">                TopicBuilder.name(Topicos.TOPIC_ATUALIZACAO_TESTES).partitions(1).build()</span>
+                );
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>
