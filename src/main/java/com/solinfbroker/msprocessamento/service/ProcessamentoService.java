@@ -2,10 +2,7 @@ package com.solinfbroker.msprocessamento.service;
 
 import com.solinfbroker.msprocessamento.dtos.OrdemKafka;
 import com.solinfbroker.msprocessamento.model.*;
-import com.solinfbroker.msprocessamento.repository.CarteiraRepository;
-import com.solinfbroker.msprocessamento.repository.ClienteRepository;
-import com.solinfbroker.msprocessamento.repository.OperacaoRepository;
-import com.solinfbroker.msprocessamento.repository.OrdemRepository;
+import com.solinfbroker.msprocessamento.repository.*;
 import lombok.AllArgsConstructor;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -24,6 +21,7 @@ public class ProcessamentoService {
     private final OperacaoRepository operacaoRepository;
     private final ClienteRepository clienteRepository;
     private final CarteiraRepository carteiraRepository;
+    private final AtivoRepository ativoRepository;
     public void processarOrdemCompra(OrdemKafka ordemKafka){
         int indexControle = 0;
         while(indexControle < 5 ){
@@ -148,6 +146,7 @@ public class ProcessamentoService {
             ordemCompra = ordemRepository.save(ordemCompra);
             ordemVenda = ordemRepository.save(ordemVenda);
             operacao = operacaoRepository.save(operacao);
+            atualizarAtivo(operacao);
             adicionarPapeisCarteira(operacao, ordemCompra);
             removerPapeisCarteira(operacao,ordemVenda);
             indexControle = 5;
@@ -155,6 +154,22 @@ public class ProcessamentoService {
         }catch (ObjectOptimisticLockingFailureException e){
             indexControle = indexControle +1;
             return indexControle;
+        }
+    }
+
+    public void atualizarAtivo(Operacao operacao){
+        Optional<AtivoModel> ativoModel = ativoRepository.findById(operacao.getOrdemCompra().getIdAtivo());
+        if(ativoModel.isPresent()){
+            if(operacao.getValorAtivoExecucao() > ativoModel.get().getValorMax()){
+                ativoModel.get().setValorMax(operacao.getValorAtivoExecucao());
+                ativoModel.get().setValor(operacao.getValorAtivoExecucao());
+            }
+            if (operacao.getValorAtivoExecucao() < ativoModel.get().getValorMin()){
+                ativoModel.get().setValorMin(operacao.getValorAtivoExecucao());
+                ativoModel.get().setValor(operacao.getValorAtivoExecucao());
+
+            }
+            ativoRepository.save(ativoModel.get());
         }
     }
 

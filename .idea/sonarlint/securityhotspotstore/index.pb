@@ -59,3 +59,9 @@ w
 Gsrc/main/java/com/solinfbroker/msprocessamento/model/enumTipoOrdem.java,5/8/58def40d409e65a32350c1f196ec408d7d87f0c6
 d
 4src/test/java/resources/application-teste.properties,5/c/5c26f854c0d9c8e1c259049549f5cafebb15fd0c
+x
+Hsrc/main/java/com/solinfbroker/msprocessamento/model/HistoricoPreco.java,1/8/1822e9c6333d1cdccaa49ecdfde1019ac1fe941c
+‡
+Wsrc/main/java/com/solinfbroker/msprocessamento/repository/HistoricoPrecoRepository.java,a/a/aa7e1cdbd726b959dd3f431b984b764b9f44dd67
+~
+Nsrc/main/java/com/solinfbroker/msprocessamento/repository/AtivoRepository.java,0/9/095dd82801585a442939120dd0059d9d75430d38
