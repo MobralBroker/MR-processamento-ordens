@@ -20,7 +20,7 @@ WORKDIR /MS-processamento-ordens
 # Copia apenas o JAR construído do estágio anterior
 COPY --from=builder /MS-processamento-ordens/target/*.jar app.jar
 
-# Expondo a porta 8080
+# Expondo a porta 8082
 EXPOSE 8082
 
 # Comando para executar a aplicação quando o contêiner for iniciado
