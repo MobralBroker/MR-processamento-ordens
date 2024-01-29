@@ -7,9 +7,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.chrono.ChronoLocalDate;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -162,11 +160,11 @@ public class ProcessamentoService {
     public void atualizarAtivo(Operacao operacao){
         Optional<AtivoModel> ativoModel = ativoRepository.findById(operacao.getOrdemCompra().getIdAtivo());
         if(ativoModel.isPresent()){
-            if(ativoModel.get().getAtualizacao().isBefore(ChronoLocalDate.from(LocalDateTime.now()))){
+            if(ativoModel.get().getAtualizacao().isBefore(LocalDateTime.now())){
                 ativoModel.get().setValorMin(operacao.getValorAtivoExecucao());
                 ativoModel.get().setValorMax(operacao.getValorAtivoExecucao());
                 ativoModel.get().setValor(operacao.getValorAtivoExecucao());
-                ativoModel.get().setAtualizacao(LocalDate.now());
+                ativoModel.get().setAtualizacao(LocalDateTime.now());
             }
             if(operacao.getValorAtivoExecucao() > ativoModel.get().getValorMax()){
                 ativoModel.get().setValorMax(operacao.getValorAtivoExecucao());

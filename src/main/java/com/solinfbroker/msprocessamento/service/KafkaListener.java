@@ -16,7 +16,7 @@ public class KafkaListener {
 
     private final ProcessamentoService processamentoService;
 
-    @org.springframework.kafka.annotation.KafkaListener(topics = Topicos.TOPIC_ORDEM,  groupId = Topicos.TOPIC_ORDEM)
+    @org.springframework.kafka.annotation.KafkaListener(topics = Topicos.TOPIC_ORDEM,  groupId = "grupo-processamento")
     public void listeningOrdem(ConsumerRecord<String, LinkedHashMap<String,Object>> mensagem){
         ObjectMapper objectMapper = new ObjectMapper();
         OrdemKafka ordemKafka = objectMapper.convertValue(mensagem.value(), OrdemKafka.class);
