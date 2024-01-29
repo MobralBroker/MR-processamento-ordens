@@ -51,14 +51,8 @@ H
 Nsrc/main/java/com/solinfbroker/msprocessamento/MsProcessamentoApplication.java,3/0/30fb526cbc7f4226c02f35559a26a1381682df54
 „
 Tsrc/test/java/com/solinfbroker/msprocessamento/service/ProcessamentoServiceTest.java,5/5/5501df665516bd0aff9505fc8dcb441febe749a0
-}
-Msrc/test/com/solinfbroker/msprocessamento/MsProcessamentoApplicationTest.java,c/f/cfe8c5393f744ba625b556732d54b5496c749ea8
-
-Osrc/test/com/solinfbroker/msprocessamento/service/ProcessamentoServiceTest.java,0/5/056103d7b9e59769e68a44f4dd3f8402f60490cc
 w
 Gsrc/main/java/com/solinfbroker/msprocessamento/model/enumTipoOrdem.java,5/8/58def40d409e65a32350c1f196ec408d7d87f0c6
-d
-4src/test/java/resources/application-teste.properties,5/c/5c26f854c0d9c8e1c259049549f5cafebb15fd0c
 x
 Hsrc/main/java/com/solinfbroker/msprocessamento/model/HistoricoPreco.java,1/8/1822e9c6333d1cdccaa49ecdfde1019ac1fe941c
 ‡
