@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;
@@ -26,7 +27,7 @@ public class ProcessamentoService {
         int indexControle = 0;
         while(indexControle < 5 ){
             Optional<Ordem> ordemCompra = ordemRepository.findById(Long.valueOf(ordemKafka.getId()));
-            List<Ordem> ordensVendasAbertas = ordemRepository.findOrdemAbertaVenda();
+            List<Ordem> ordensVendasAbertas = ordemRepository.findOrdemAbertaVenda(ordemCompra.get().getIdAtivo());
             if(ordemCompra.isPresent() && !ordensVendasAbertas.isEmpty()){
                 for (Ordem ordensVendasAberta : ordensVendasAbertas) { //Adicionar esta validação no if abaixo || ordemCompra.get().getCliente().getId() == ordensVendasAberta.getId()
                     Operacao operacao = new Operacao();
@@ -85,7 +86,7 @@ public class ProcessamentoService {
         int indexControle = 0;
         while(indexControle < 5 ){
             Optional<Ordem> ordemVenda = ordemRepository.findById(Long.valueOf(ordemKafka.getId()));
-            List<Ordem> ordensCompraAbertaList = ordemRepository.findOrdemAbertaCompra();
+            List<Ordem> ordensCompraAbertaList = ordemRepository.findOrdemAbertaCompra(ordemVenda.get().getIdAtivo());
             if(ordemVenda.isPresent() && !ordensCompraAbertaList.isEmpty()){
                 for (Ordem ordensCompraAberta : ordensCompraAbertaList) { //Adicionar esta validação no if abaixo || ordemCompra.get().getCliente().getId() == ordensVendasAberta.getId()
                     if (ordemVenda.get().getStatusOrdem().equals(enumStatus.EXECUTADA) || ordemVenda.get().getValorOrdem() > ordensCompraAberta.getValorOrdem()) {
@@ -160,6 +161,12 @@ public class ProcessamentoService {
     public void atualizarAtivo(Operacao operacao){
         Optional<AtivoModel> ativoModel = ativoRepository.findById(operacao.getOrdemCompra().getIdAtivo());
         if(ativoModel.isPresent()){
+            if(ativoModel.get().getAtualizacao().toLocalDate().isBefore(LocalDate.now())){
+                ativoModel.get().setValorMin(operacao.getValorAtivoExecucao());
+                ativoModel.get().setValorMax(operacao.getValorAtivoExecucao());
+                ativoModel.get().setValor(operacao.getValorAtivoExecucao());
+                ativoModel.get().setAtualizacao(LocalDateTime.now());
+            }
             if(operacao.getValorAtivoExecucao() > ativoModel.get().getValorMax()){
                 ativoModel.get().setValorMax(operacao.getValorAtivoExecucao());
                 ativoModel.get().setValor(operacao.getValorAtivoExecucao());

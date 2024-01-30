@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -27,7 +27,7 @@ public class AtivoModel {
 
     @Column(name = "atualizacao", nullable = false)
     @JsonFormat(pattern="dd/MM/yyyy")
-    private LocalDate atualizacao;
+    private LocalDateTime atualizacao;
 
     @Column(name = "quantidades_papeis", nullable = false)
     private Integer quantidadesPapeis;
