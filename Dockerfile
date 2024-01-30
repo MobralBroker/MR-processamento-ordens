@@ -21,7 +21,7 @@ WORKDIR /MS-processamento-ordens
 COPY --from=builder /MS-processamento-ordens/target/*.jar app.jar
 
 # Expondo a porta 8082
-EXPOSE 8082
+#EXPOSE 8082
 
 # Comando para executar a aplicação quando o contêiner for iniciado
 CMD ["java", "-jar", "app.jar"]
