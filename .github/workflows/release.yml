@@ -3,7 +3,7 @@ name: Versionamento docker hub
 on:
   release:
     types:
-      - prereleased
+      - released
 
 jobs:
   build-and-push-image:
@@ -35,4 +35,4 @@ jobs:
         with:
           context: .
           push: true
-          tags:  solinfbroker/api-processament-ordens:development
+          tags:  solinfbroker/api-processament-ordens:latest
