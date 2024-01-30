@@ -15,9 +15,9 @@ public interface OrdemRepository extends JpaRepository<Ordem,Long> {
 
     List<Ordem> findByIdCliente(Long idCliente);
 
-    @Query(value = "SELECT * FROM ordem WHERE (status_ordem = 'ABERTA' OR status_ordem = 'EXECUTADA_PARCIAL') AND tipo_ordem = 'ORDEM_VENDA' ORDER BY data_lancamento ASC LIMIT 20;",nativeQuery = true)
-    List<Ordem> findOrdemAbertaVenda();
-    @Query(value = "SELECT * FROM ordem WHERE (status_ordem = 'ABERTA' OR status_ordem = 'EXECUTADA_PARCIAL') AND tipo_ordem = 'ORDEM_COMPRA' ORDER BY data_lancamento DESC LIMIT 20;",nativeQuery = true)
-    List<Ordem> findOrdemAbertaCompra();
+    @Query(value = "SELECT * FROM ordem WHERE (status_ordem = 'ABERTA' OR status_ordem = 'EXECUTADA_PARCIAL') AND tipo_ordem = 'ORDEM_VENDA' AND id_ativo = ?1 ORDER BY data_lancamento ASC LIMIT 20;",nativeQuery = true)
+    List<Ordem> findOrdemAbertaVenda(Long idAtivo);
+    @Query(value = "SELECT * FROM ordem WHERE (status_ordem = 'ABERTA' OR status_ordem = 'EXECUTADA_PARCIAL') AND tipo_ordem = 'ORDEM_COMPRA' AND id_ativo = ?1 ORDER BY data_lancamento DESC LIMIT 20;",nativeQuery = true)
+    List<Ordem> findOrdemAbertaCompra(Long idAtivo);
 
 }

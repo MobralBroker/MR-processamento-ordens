@@ -38,15 +38,17 @@ class ProcessamentoServiceTest {
 
         List<Ordem> ordensVendasAberta = new ArrayList<>();
         Ordem ordem = new Ordem();
+        ordem.setIdAtivo(1L); //TODO corrigir nos demais
         ordem.setStatusOrdem(enumStatus.EXECUTADA);
         Optional<Ordem> ordemOpt = Optional.of(ordem);
         ordensVendasAberta.add(ordem);
-        when(ordemRepository.findOrdemAbertaVenda()).thenReturn(ordensVendasAberta);
+        when(ordemRepository.findOrdemAbertaVenda(anyLong())).thenReturn(ordensVendasAberta);
+//        when(ordemOpt.get().getIdAtivo()).thenReturn(1L);
         when(ordemRepository.findById(anyLong())).thenReturn(ordemOpt);
 
         processamentoService.processarOrdemCompra(ordemKafka);
 
-        verify(ordemRepository, times(1)).findOrdemAbertaVenda();
+        verify(ordemRepository, times(1)).findOrdemAbertaVenda(anyLong());
         verify(ordemRepository, times(1)).findById(anyLong());
     }
 
@@ -92,7 +94,7 @@ class ProcessamentoServiceTest {
 
         int indexControle = 0;
 
-        when(ordemRepository.findOrdemAbertaVenda()).thenReturn(ordensVendasAberta);
+        when(ordemRepository.findOrdemAbertaVenda(anyLong())).thenReturn(ordensVendasAberta);
         when(ordemRepository.findById(anyLong())).thenReturn(ordemCompraOpt);
         when(clienteRepository.findById(anyLong())).thenReturn(clienteCompraOpt);
         when(ordemRepository.save(any())).thenReturn(ordemCompra);
@@ -102,7 +104,7 @@ class ProcessamentoServiceTest {
 
         processamentoService.processarOrdemCompra(ordemKafka);
 
-        verify(ordemRepository, times(1)).findOrdemAbertaVenda();
+        verify(ordemRepository, times(1)).findOrdemAbertaVenda(anyLong());
         verify(ordemRepository, times(1)).findById(anyLong());
         verify(clienteRepository, times(2)).findById(anyLong());
         verify(clienteRepository,times(2)).save(any());
@@ -152,7 +154,7 @@ class ProcessamentoServiceTest {
 
         int indexControle = 0;
 
-        when(ordemRepository.findOrdemAbertaVenda()).thenReturn(ordensVendasAberta);
+        when(ordemRepository.findOrdemAbertaVenda(anyLong())).thenReturn(ordensVendasAberta);
         when(ordemRepository.findById(anyLong())).thenReturn(ordemCompraOpt);
         when(clienteRepository.findById(anyLong())).thenReturn(clienteCompraOpt);
         when(ordemRepository.save(any())).thenReturn(ordemCompra);
@@ -163,7 +165,7 @@ class ProcessamentoServiceTest {
 
         processamentoService.processarOrdemCompra(ordemKafka);
 
-        verify(ordemRepository, times(1)).findOrdemAbertaVenda();
+        verify(ordemRepository, times(1)).findOrdemAbertaVenda(anyLong());
         verify(ordemRepository, times(1)).findById(anyLong());
         verify(clienteRepository, times(2)).findById(anyLong());
         verify(clienteRepository,times(2)).save(any());
@@ -183,12 +185,12 @@ class ProcessamentoServiceTest {
         ordem.setStatusOrdem(enumStatus.EXECUTADA);
         Optional<Ordem> ordemOpt = Optional.of(ordem);
         ordensCompraAberta.add(ordem);
-        when(ordemRepository.findOrdemAbertaCompra()).thenReturn(ordensCompraAberta);
+        when(ordemRepository.findOrdemAbertaCompra(anyLong())).thenReturn(ordensCompraAberta);
         when(ordemRepository.findById(anyLong())).thenReturn(ordemOpt);
 
         processamentoService.processarOrdemVenda(ordemKafka);
 
-        verify(ordemRepository, times(1)).findOrdemAbertaCompra();
+        verify(ordemRepository, times(1)).findOrdemAbertaCompra(anyLong());
         verify(ordemRepository, times(1)).findById(anyLong());
     }
 
@@ -234,7 +236,7 @@ class ProcessamentoServiceTest {
 
         int indexControle = 0;
 
-        when(ordemRepository.findOrdemAbertaCompra()).thenReturn(ordensCompraAberta);
+        when(ordemRepository.findOrdemAbertaCompra(anyLong())).thenReturn(ordensCompraAberta);
         when(ordemRepository.findById(anyLong())).thenReturn(ordemVendaOpt);
         when(clienteRepository.findById(anyLong())).thenReturn(clienteVendaOpt);
         when(ordemRepository.save(any())).thenReturn(ordemVenda);
@@ -245,7 +247,7 @@ class ProcessamentoServiceTest {
 
         processamentoService.processarOrdemVenda(ordemKafka);
 
-        verify(ordemRepository, times(1)).findOrdemAbertaCompra();
+        verify(ordemRepository, times(1)).findOrdemAbertaCompra(anyLong());
         verify(ordemRepository, times(1)).findById(anyLong());
         verify(clienteRepository, times(2)).findById(anyLong());
         verify(clienteRepository,times(2)).save(any());
@@ -295,7 +297,7 @@ class ProcessamentoServiceTest {
 
         int indexControle = 0;
 
-        when(ordemRepository.findOrdemAbertaCompra()).thenReturn(ordensCompraAberta);
+        when(ordemRepository.findOrdemAbertaCompra(anyLong())).thenReturn(ordensCompraAberta);
         when(ordemRepository.findById(anyLong())).thenReturn(ordemVendaOpt);
         when(clienteRepository.findById(anyLong())).thenReturn(clienteVendaOpt);
         when(ordemRepository.save(any())).thenReturn(ordemVenda);
@@ -305,7 +307,7 @@ class ProcessamentoServiceTest {
 
         processamentoService.processarOrdemVenda(ordemKafka);
 
-        verify(ordemRepository, times(1)).findOrdemAbertaCompra();
+        verify(ordemRepository, times(1)).findOrdemAbertaCompra(anyLong());
         verify(ordemRepository, times(1)).findById(anyLong());
         verify(clienteRepository, times(2)).findById(anyLong());
         verify(clienteRepository,times(2)).save(any());
