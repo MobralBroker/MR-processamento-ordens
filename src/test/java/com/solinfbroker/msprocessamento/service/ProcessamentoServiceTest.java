@@ -322,4 +322,106 @@ class ProcessamentoServiceTest {
         verify(carteiraRepository,times(1)).delete(any());
         verify(carteiraRepository,times(1)).save(any());
     }
+
+    @Test
+    void testRemoverPapeisCarteiraSucesso() {
+        Set<CarteiraModel> carteiras = new HashSet<>();
+
+        Ordem ordemVenda = new Ordem();
+        ordemVenda.setId(1L);
+        ordemVenda.setQuantidadeAberto(1);
+        ordemVenda.setValorOrdem(11);
+        ordemVenda.setStatusOrdem(enumStatus.ABERTA);
+        ordemVenda.setIdCliente(1L);
+        ordemVenda.setIdAtivo(1L);
+        AtivoModel ativo = mock(AtivoModel.class);
+        ativo.setId(1l);
+        ordemVenda.setAtivo(ativo);
+
+        Operacao operacao = new Operacao();
+        operacao.setQuantidade(1);
+        operacao.setValorAtivoExecucao(10);
+
+        ClienteModel clienteModel = new ClienteModel();
+        clienteModel.setId(1L);
+        clienteModel.setSaldo(1000);
+
+        CarteiraModel carteiraModel = new CarteiraModel();
+        carteiraModel.setId(1L);
+        carteiraModel.setIdAtivo(1L);
+        carteiraModel.setIdCliente(1L);
+        carteiraModel.setQuantidade(2);
+
+        when(clienteRepository.findById(ordemVenda.getIdCliente())).thenReturn(Optional.of(clienteModel));
+        when(carteiraRepository.findByIdAtivoAndIdClienteOrderByDataCompraAsc(ativo.getId(), ordemVenda.getId())).thenReturn(carteiras);
+
+
+        processamentoService.removerPapeisCarteira(operacao, ordemVenda);
+
+//        verify(clienteRepository, times(1)).findById(ordemVenda.getIdCliente());
+//        verify(carteiraRepository, times(1)).findByIdAtivoAndIdClienteOrderByDataCompraAsc(ordemVenda.getAtivo().getId(), clienteModel.getId());
+//        verify(clienteRepository, times(1)).save(clienteModel);
+//        verify(carteiraRepository, times(1)).save(carteiraModel);
+//        verify(carteiraRepository, times(1)).delete(carteiraModel);
+    }
+
+    @Test
+    void adicionarPapeisCarteira() {
+        ClienteModel clienteModel = new ClienteModel();
+        Ordem ordemCompra = new Ordem();
+        Operacao operacao = new Operacao();
+        AtivoModel ativo = mock(AtivoModel.class);
+
+        clienteModel.setId(1L);
+
+        ordemCompra.setId(1L);
+        ordemCompra.setQuantidadeAberto(1);
+        ordemCompra.setValorOrdem(11);
+        ordemCompra.setStatusOrdem(enumStatus.ABERTA);
+        ordemCompra.setIdCliente(1L);
+        ordemCompra.setIdAtivo(1L);
+        ordemCompra.setCliente(clienteModel);
+        ativo.setId(1l);
+        ordemCompra.setAtivo(ativo);
+
+        operacao.setQuantidade(1);
+        operacao.setValorAtivoExecucao(10);
+        operacao.setDataExecucao(LocalDateTime.now());
+        operacao.setQuantidade(10);
+
+        processamentoService.adicionarPapeisCarteira(operacao, ordemCompra);
+
+        verify(carteiraRepository, times(1)).save(any(CarteiraModel.class));
+    }
+
+    @Test
+    void adicionarPapeisCarteiraClientePresent() {
+        ClienteModel clienteModelFicticio = new ClienteModel();
+        ClienteModel clienteModel = new ClienteModel();
+        Ordem ordemCompra = new Ordem();
+        Operacao operacao = new Operacao();
+        AtivoModel ativo = mock(AtivoModel.class);
+
+        clienteModel.setId(1L);
+
+        ordemCompra.setId(1L);
+        ordemCompra.setQuantidadeAberto(1);
+        ordemCompra.setValorOrdem(11);
+        ordemCompra.setStatusOrdem(enumStatus.ABERTA);
+        ordemCompra.setIdCliente(1L);
+        ordemCompra.setIdAtivo(1L);
+        ordemCompra.setCliente(clienteModel);
+        ativo.setId(1l);
+        ordemCompra.setAtivo(ativo);
+
+        operacao.setQuantidade(1);
+        operacao.setValorAtivoExecucao(10);
+        operacao.setDataExecucao(LocalDateTime.now());
+        operacao.setQuantidade(10);
+        when(clienteRepository.findById(1L)).thenReturn(Optional.of(clienteModelFicticio));
+
+        processamentoService.adicionarPapeisCarteira(operacao, ordemCompra);
+
+        verify(carteiraRepository, times(1)).save(any(CarteiraModel.class));
+    }
 }
