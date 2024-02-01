@@ -59,3 +59,5 @@ Hsrc/main/java/com/solinfbroker/msprocessamento/model/HistoricoPreco.java,1/8/1
 Wsrc/main/java/com/solinfbroker/msprocessamento/repository/HistoricoPrecoRepository.java,a/a/aa7e1cdbd726b959dd3f431b984b764b9f44dd67
 ~
 Nsrc/main/java/com/solinfbroker/msprocessamento/repository/AtivoRepository.java,0/9/095dd82801585a442939120dd0059d9d75430d38
+9
+	README.md,8/e/8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d
