@@ -19,4 +19,7 @@ public interface CarteiraRepository extends JpaRepository<CarteiraModel,Long> {
 
     @Query("SELECT c FROM CarteiraModel c WHERE c.idCliente = :idCliente AND c.idAtivo = :idAtivo ORDER BY c.quantidadeBloqueada DESC")
     Set<CarteiraModel> findByIdClienteAndIdAtivoOrderByQuantidadeBloqueadaDesc(@Param("idCliente") Long idCliente, @Param("idAtivo") Long idAtivo);
+
+    @Query("SELECT c FROM CarteiraModel c WHERE c.idCliente = :idCliente AND c.idAtivo = :idAtivo ORDER BY c.quantidade DESC")
+    Set<CarteiraModel> findByIdClienteAndIdAtivoOrderByQuantidadeDesc(@Param("idCliente") Long idCliente, @Param("idAtivo") Long idAtivo);
 }

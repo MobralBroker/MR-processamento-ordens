@@ -1,10 +1,28 @@
 
 s
-java:S3655"VCall "ordemCompra.isPresent()" or "!ordemCompra.isEmpty()" before accessing the value.(šˆ’ì8ÔâÒ‰Ö1
+java:S3655"VCall "ordemCompra.isPresent()" or "!ordemCompra.isEmpty()" before accessing the value.(šˆ’ì8“À¥Ö1
 v
-java:S3655Y"TCall "ordemVenda.isPresent()" or "!ordemVenda.isEmpty()" before accessing the value.(ÚãÓøÿÿÿÿ8ÔâÒ‰Ö1
+java:S3655Z"TCall "ordemVenda.isPresent()" or "!ordemVenda.isEmpty()" before accessing the value.(ÚãÓøÿÿÿÿ8“À¥Ö1
 t
-java:S3776"RRefactor this method to reduce its Cognitive Complexity from 33 to the 15 allowed.( î†úÿÿÿÿ8ØâÒ‰Ö1
+java:S2229K"X"salvarDados's" @Transactional requirement is incompatible with the one for this method.(Û€»8•À¥Ö1
+v
+java:S2229†"X"salvarDados's" @Transactional requirement is incompatible with the one for this method.(×šµÔ8–À¥Ö1
 t
-java:S3776U"RRefactor this method to reduce its Cognitive Complexity from 33 to the 15 allowed.(¾¾¹ÿÿÿÿÿ8ãâÒ‰Ö1
-Y	java:S125Ò"<This block of commented-out lines of code should be removed.(®şŸ8úâÒ‰Ö1
+java:S3776"RRefactor this method to reduce its Cognitive Complexity from 33 to the 15 allowed.( î†úÿÿÿÿ8˜À¥Ö1
+q
+java:S6809K"UCall transactional methods via an injected dependency instead of directly via 'this'.(Û€»8À¥Ö1
+t
+java:S3776V"RRefactor this method to reduce its Cognitive Complexity from 33 to the 15 allowed.(¾¾¹ÿÿÿÿÿ8ŸÀ¥Ö1
+s
+java:S6809†"UCall transactional methods via an injected dependency instead of directly via 'this'.(×šµÔ8¥À¥Ö1
+r
+java:S6809—"UCall transactional methods via an injected dependency instead of directly via 'this'.(Üêƒ8¦À¥Ö1
+x
+java:S6809˜"UCall transactional methods via an injected dependency instead of directly via 'this'.(Õüçåûÿÿÿÿ8§À¥Ö1
+p
+java:S3776Ğ"RRefactor this method to reduce its Cognitive Complexity from 21 to the 15 allowed.(¨ ¼¿8®À¥Ö1
+_
+java:S1854æ"ARemove this useless assignment to local variable "carteirasDicp".(‚ºéÙ8®À¥Ö1
+Y	java:S125×"<This block of commented-out lines of code should be removed.(®şŸ8°À¥Ö1
+P
+java:S1481æ"2Remove this unused "carteirasDicp" local variable.(‚ºéÙ8²À¥Ö1
