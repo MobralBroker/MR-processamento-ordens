@@ -207,16 +207,17 @@ public class ProcessamentoService {
         if(clienteVenda.isPresent()){
             clienteVenda.get().setSaldo(clienteVenda.get().getSaldo() + valorVenda);
             clienteRepository.save(clienteVenda.get());
-            Set<CarteiraModel> carteiras = carteiraRepository.findByIdAtivoAndIdClienteOrderByDataCompraAsc(ordemVenda.getAtivo().getId(),clienteVenda.get().getId());
+//            Set<CarteiraModel> carteiras = carteiraRepository.findByIdAtivoAndIdClienteOrderByDataCompraAsc(ordemVenda.getAtivo().getId(),clienteVenda.get().getId());
+            Set<CarteiraModel> carteiras =carteiraRepository.findByIdClienteAndIdAtivoOrderByQuantidadeBloqueadaDesc(clienteVenda.get().getId(),ordemVenda.getAtivo().getId());
             if(!carteiras.isEmpty()){
                 Iterator<CarteiraModel> iter = carteiras.iterator();
                 while(iter.hasNext() && operacao.getQuantidade() > 0){
                     CarteiraModel carteiraModel = iter.next();
-                    if(carteiraModel.getQuantidade() > operacao.getQuantidade()){
-                        carteiraModel.setQuantidade(carteiraModel.getQuantidade() - operacao.getQuantidade());
+                    if(carteiraModel.getQuantidadeBloqueada() > operacao.getQuantidade()){
+                        carteiraModel.setQuantidadeBloqueada(carteiraModel.getQuantidadeBloqueada() - operacao.getQuantidade());
                         carteiraRepository.save(carteiraModel);
                     }else{
-                        operacao.setQuantidade(operacao.getQuantidade() - carteiraModel.getQuantidade());
+                        operacao.setQuantidade(operacao.getQuantidade() - carteiraModel.getQuantidadeBloqueada());
                         carteiraRepository.delete(carteiraModel);
                     }
                 }
