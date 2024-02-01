@@ -25,6 +25,9 @@ public class CarteiraModel {
   @Column(nullable = false)
   private Integer quantidade;
 
+  @Column(nullable = false)
+  private Integer quantidadeBloqueada;
+
   @Column(name = "data_compra", nullable = false)
   @JsonFormat(pattern="dd/MM/yyyy")
   private LocalDateTime dataCompra;

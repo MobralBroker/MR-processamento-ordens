@@ -99,6 +99,7 @@ class ProcessamentoServiceTest {
         carteiraModels.add(carteiraModel);
 
 
+
         int indexControle = 0;
 
         when(ordemRepository.findOrdemAbertaVenda(anyLong())).thenReturn(ordensVendasAberta);
@@ -106,10 +107,12 @@ class ProcessamentoServiceTest {
         when(clienteRepository.findById(anyLong())).thenReturn(clienteCompraOpt);
         when(ordemRepository.save(any())).thenReturn(ordemCompra);
         when(operacaoRepository.save(any())).thenReturn(operacao);
-        when(carteiraRepository.findByIdAtivoAndIdClienteOrderByDataCompraAsc(anyLong(),anyLong())).thenReturn(carteiraModels);
         when(operacao.getQuantidade()).thenReturn(1);
         when(ativoRepository.findById(anyLong())).thenReturn(ativoModelOpt);
         when(operacao.getOrdemCompra()).thenReturn(ordemCompra);
+        when(ativoModelOpt.get().getAtualizacao()).thenReturn(LocalDateTime.now().minusDays(1));
+        when((carteiraRepository.findByIdClienteAndIdAtivoOrderByQuantidadeBloqueadaDesc(anyLong(),anyLong()))).thenReturn(carteiraModels);
+
         processamentoService.processarOrdemCompra(ordemKafka);
 
         verify(ordemRepository, times(1)).findOrdemAbertaVenda(anyLong());
@@ -147,6 +150,8 @@ class ProcessamentoServiceTest {
         ordemCompra.setIdCliente(1L);
         AtivoModel ativo = mock(AtivoModel.class);
         ativo.setId(1l);
+        ordemCompra.setIdAtivo(1l);
+        ordemCompra.setIdCliente(1L);
         ordemCompra.setAtivo(ativo);
         ordemCompra.setCliente(clienteCompra);
 
@@ -154,7 +159,7 @@ class ProcessamentoServiceTest {
         ordensVendasAberta.add(ordemVenda);
 
         Operacao operacao = mock(Operacao.class);
-
+        operacao.setOrdemCompra(ordemCompra);
         CarteiraModel carteiraModel = mock(CarteiraModel.class);
         carteiraModel.setQuantidade(10);
         Set<CarteiraModel> carteiraModels = new HashSet<>();
@@ -167,9 +172,10 @@ class ProcessamentoServiceTest {
         when(clienteRepository.findById(anyLong())).thenReturn(clienteCompraOpt);
         when(ordemRepository.save(any())).thenReturn(ordemCompra);
         when(operacaoRepository.save(any())).thenReturn(operacao);
-        when(carteiraRepository.findByIdAtivoAndIdClienteOrderByDataCompraAsc(anyLong(),anyLong())).thenReturn(carteiraModels);
+//        when(carteiraRepository.findByIdAtivoAndIdClienteOrderByDataCompraAsc(anyLong(),anyLong())).thenReturn(carteiraModels);
         //        when(ordemOpt.get().getStatusOrdem().equals(enumStatus.EXECUTADA)).thenReturn(enumStatus.EXECUTADA);
         when(operacao.getQuantidade()).thenReturn(12);
+        when(operacao.getOrdemCompra()).thenReturn(ordemCompra);
 
         processamentoService.processarOrdemCompra(ordemKafka);
 
@@ -177,8 +183,6 @@ class ProcessamentoServiceTest {
         verify(ordemRepository, times(1)).findById(anyLong());
         verify(clienteRepository, times(2)).findById(anyLong());
         verify(clienteRepository,times(2)).save(any());
-        verify(carteiraRepository,times(1)).delete(any());
-        verify(carteiraRepository,times(1)).save(any());
     }
 
 

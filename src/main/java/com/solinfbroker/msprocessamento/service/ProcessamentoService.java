@@ -6,6 +6,7 @@ import com.solinfbroker.msprocessamento.repository.*;
 import lombok.AllArgsConstructor;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -92,7 +93,6 @@ public class ProcessamentoService {
                     if (ordemVenda.get().getStatusOrdem().equals(enumStatus.EXECUTADA) || ordemVenda.get().getValorOrdem() > ordensCompraAberta.getValorOrdem()) {
                         return;
                     }
-
                     Operacao operacao = new Operacao();
 
                     //Verificar qual é a quantidade que irá utilizar
@@ -141,7 +141,7 @@ public class ProcessamentoService {
         }
     }
 
-
+    @Transactional
     public Integer salvarDados(Ordem ordemCompra, Ordem ordemVenda, Operacao operacao, int indexControle){
         try {
             ordemCompra = ordemRepository.save(ordemCompra);
@@ -153,6 +153,7 @@ public class ProcessamentoService {
             indexControle = 5;
             return indexControle;
         }catch (ObjectOptimisticLockingFailureException e){
+
             indexControle = indexControle +1;
             return indexControle;
         }
@@ -167,19 +168,22 @@ public class ProcessamentoService {
                 ativoModel.get().setValor(operacao.getValorAtivoExecucao());
                 ativoModel.get().setAtualizacao(LocalDateTime.now());
             }
-            if(operacao.getValorAtivoExecucao() > ativoModel.get().getValorMax()){
+            if(operacao.getValorAtivoExecucao() > ativoModel.get().getValorMax()) {
                 ativoModel.get().setValorMax(operacao.getValorAtivoExecucao());
                 ativoModel.get().setValor(operacao.getValorAtivoExecucao());
-            }
-            if (operacao.getValorAtivoExecucao() < ativoModel.get().getValorMin()){
+            } else if (operacao.getValorAtivoExecucao() < ativoModel.get().getValorMin()){
                 ativoModel.get().setValorMin(operacao.getValorAtivoExecucao());
                 ativoModel.get().setValor(operacao.getValorAtivoExecucao());
-
+            } else {
+                ativoModel.get().setValorMax(operacao.getValorAtivoExecucao());
+                ativoModel.get().setValor(operacao.getValorAtivoExecucao());
+                ativoModel.get().setValorMin(operacao.getValorAtivoExecucao());
             }
             ativoRepository.save(ativoModel.get());
         }
     }
 
+    @Transactional
     public void adicionarPapeisCarteira(Operacao operacao, Ordem ordemCompra){
         Optional<ClienteModel> clienteCompra = clienteRepository.findById(ordemCompra.getIdCliente());
         double valorCompra = operacao.getQuantidade() * operacao.getValorAtivoExecucao();
@@ -196,10 +200,11 @@ public class ProcessamentoService {
         carteiraModel.setIdAtivo(ordemCompra.getAtivo().getId());
         carteiraModel.setIdCliente(ordemCompra.getCliente().getId());
         carteiraModel.setDataCompra(operacao.getDataExecucao());
-        carteiraModel.setQuantidade(operacao.getQuantidade());
+        carteiraModel.setQuantidadeBloqueada(0);
         carteiraRepository.save(carteiraModel);
     }
 
+    @Transactional
     public void removerPapeisCarteira(Operacao operacao, Ordem ordemVenda){
         Optional<ClienteModel> clienteVenda = clienteRepository.findById(ordemVenda.getIdCliente());
         double valorVenda = operacao.getQuantidade() * operacao.getValorAtivoExecucao();
@@ -207,16 +212,30 @@ public class ProcessamentoService {
         if(clienteVenda.isPresent()){
             clienteVenda.get().setSaldo(clienteVenda.get().getSaldo() + valorVenda);
             clienteRepository.save(clienteVenda.get());
-            Set<CarteiraModel> carteiras = carteiraRepository.findByIdAtivoAndIdClienteOrderByDataCompraAsc(ordemVenda.getAtivo().getId(),clienteVenda.get().getId());
+//            Set<CarteiraModel> carteiras = carteiraRepository.findByIdAtivoAndIdClienteOrderByDataCompraAsc(ordemVenda.getAtivo().getId(),clienteVenda.get().getId());
+            Set<CarteiraModel> carteiras =carteiraRepository.findByIdClienteAndIdAtivoOrderByQuantidadeBloqueadaDesc(clienteVenda.get().getId(),ordemVenda.getAtivo().getId());
             if(!carteiras.isEmpty()){
                 Iterator<CarteiraModel> iter = carteiras.iterator();
+                Integer quantidadeTotal = operacao.getQuantidade();
                 while(iter.hasNext() && operacao.getQuantidade() > 0){
                     CarteiraModel carteiraModel = iter.next();
-                    if(carteiraModel.getQuantidade() > operacao.getQuantidade()){
-                        carteiraModel.setQuantidade(carteiraModel.getQuantidade() - operacao.getQuantidade());
+                    if(carteiraModel.getQuantidadeBloqueada() > operacao.getQuantidade()){
+                        carteiraModel.setQuantidadeBloqueada(carteiraModel.getQuantidadeBloqueada() - operacao.getQuantidade());
                         carteiraRepository.save(carteiraModel);
                     }else{
-                        operacao.setQuantidade(operacao.getQuantidade() - carteiraModel.getQuantidade());
+                        operacao.setQuantidade(operacao.getQuantidade() - carteiraModel.getQuantidadeBloqueada());
+                        carteiraRepository.delete(carteiraModel);
+                    }
+                }
+                Set<CarteiraModel> carteirasDicp =carteiraRepository.findByIdClienteAndIdAtivoOrderByQuantidadeDesc(clienteVenda.get().getId(),ordemVenda.getAtivo().getId());
+                Iterator<CarteiraModel> carteirasDicpIter = carteiras.iterator();
+                while(carteirasDicpIter.hasNext() && quantidadeTotal > 0){
+                    CarteiraModel carteiraModel = carteirasDicpIter.next();
+                    if(carteiraModel.getQuantidade() > quantidadeTotal){
+                        carteiraModel.setQuantidade(carteiraModel.getQuantidade() - quantidadeTotal);
+                        carteiraRepository.save(carteiraModel);
+                    }else{
+                        quantidadeTotal = quantidadeTotal - carteiraModel.getQuantidade();
                         carteiraRepository.delete(carteiraModel);
                     }
                 }
