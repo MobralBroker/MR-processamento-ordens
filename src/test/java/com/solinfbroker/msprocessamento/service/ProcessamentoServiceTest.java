@@ -99,6 +99,7 @@ class ProcessamentoServiceTest {
         carteiraModels.add(carteiraModel);
 
 
+
         int indexControle = 0;
 
         when(ordemRepository.findOrdemAbertaVenda(anyLong())).thenReturn(ordensVendasAberta);
@@ -106,10 +107,12 @@ class ProcessamentoServiceTest {
         when(clienteRepository.findById(anyLong())).thenReturn(clienteCompraOpt);
         when(ordemRepository.save(any())).thenReturn(ordemCompra);
         when(operacaoRepository.save(any())).thenReturn(operacao);
-        when(carteiraRepository.findByIdAtivoAndIdClienteOrderByDataCompraAsc(anyLong(),anyLong())).thenReturn(carteiraModels);
         when(operacao.getQuantidade()).thenReturn(1);
         when(ativoRepository.findById(anyLong())).thenReturn(ativoModelOpt);
         when(operacao.getOrdemCompra()).thenReturn(ordemCompra);
+        when(ativoModelOpt.get().getAtualizacao()).thenReturn(LocalDateTime.now().minusDays(1));
+        when((carteiraRepository.findByIdClienteAndIdAtivoOrderByQuantidadeBloqueadaDesc(anyLong(),anyLong()))).thenReturn(carteiraModels);
+
         processamentoService.processarOrdemCompra(ordemKafka);
 
         verify(ordemRepository, times(1)).findOrdemAbertaVenda(anyLong());
@@ -147,6 +150,8 @@ class ProcessamentoServiceTest {
         ordemCompra.setIdCliente(1L);
         AtivoModel ativo = mock(AtivoModel.class);
         ativo.setId(1l);
+        ordemCompra.setIdAtivo(1l);
+        ordemCompra.setIdCliente(1L);
         ordemCompra.setAtivo(ativo);
         ordemCompra.setCliente(clienteCompra);
 
@@ -154,7 +159,7 @@ class ProcessamentoServiceTest {
         ordensVendasAberta.add(ordemVenda);
 
         Operacao operacao = mock(Operacao.class);
-
+        operacao.setOrdemCompra(ordemCompra);
         CarteiraModel carteiraModel = mock(CarteiraModel.class);
         carteiraModel.setQuantidade(10);
         Set<CarteiraModel> carteiraModels = new HashSet<>();
@@ -167,9 +172,10 @@ class ProcessamentoServiceTest {
         when(clienteRepository.findById(anyLong())).thenReturn(clienteCompraOpt);
         when(ordemRepository.save(any())).thenReturn(ordemCompra);
         when(operacaoRepository.save(any())).thenReturn(operacao);
-        when(carteiraRepository.findByIdAtivoAndIdClienteOrderByDataCompraAsc(anyLong(),anyLong())).thenReturn(carteiraModels);
+//        when(carteiraRepository.findByIdAtivoAndIdClienteOrderByDataCompraAsc(anyLong(),anyLong())).thenReturn(carteiraModels);
         //        when(ordemOpt.get().getStatusOrdem().equals(enumStatus.EXECUTADA)).thenReturn(enumStatus.EXECUTADA);
         when(operacao.getQuantidade()).thenReturn(12);
+        when(operacao.getOrdemCompra()).thenReturn(ordemCompra);
 
         processamentoService.processarOrdemCompra(ordemKafka);
 
@@ -177,8 +183,6 @@ class ProcessamentoServiceTest {
         verify(ordemRepository, times(1)).findById(anyLong());
         verify(clienteRepository, times(2)).findById(anyLong());
         verify(clienteRepository,times(2)).save(any());
-        verify(carteiraRepository,times(1)).delete(any());
-        verify(carteiraRepository,times(1)).save(any());
     }
 
 
@@ -321,5 +325,143 @@ class ProcessamentoServiceTest {
         verify(clienteRepository,times(2)).save(any());
         verify(carteiraRepository,times(1)).delete(any());
         verify(carteiraRepository,times(1)).save(any());
+    }
+
+    @Test
+    void removerPapeisCarteiraSucesso() {
+        Set<CarteiraModel> carteiras = new HashSet<>();
+
+        Ordem ordemVenda = new Ordem();
+        ordemVenda.setId(1L);
+        ordemVenda.setQuantidadeAberto(1);
+        ordemVenda.setValorOrdem(11);
+        ordemVenda.setStatusOrdem(enumStatus.ABERTA);
+        ordemVenda.setIdCliente(1L);
+        ordemVenda.setIdAtivo(1L);
+        AtivoModel ativo = mock(AtivoModel.class);
+        ativo.setId(1l);
+        ordemVenda.setAtivo(ativo);
+
+        Operacao operacao = new Operacao();
+        operacao.setQuantidade(1);
+        operacao.setValorAtivoExecucao(10);
+
+        ClienteModel clienteModel = new ClienteModel();
+        clienteModel.setId(1L);
+        clienteModel.setSaldo(1000);
+
+        CarteiraModel carteiraModel = new CarteiraModel();
+        carteiraModel.setId(1L);
+        carteiraModel.setIdAtivo(1L);
+        carteiraModel.setIdCliente(1L);
+        carteiraModel.setQuantidade(2);
+        carteiras.add(carteiraModel);
+
+        when(clienteRepository.findById(ordemVenda.getIdCliente())).thenReturn(Optional.of(clienteModel));
+        when(carteiraRepository.findByIdAtivoAndIdClienteOrderByDataCompraAsc(ordemVenda.getAtivo().getId(), clienteModel.getId())).thenReturn(carteiras);
+
+
+        processamentoService.removerPapeisCarteira(operacao, ordemVenda);
+        verify(carteiraRepository, times(1)).findByIdAtivoAndIdClienteOrderByDataCompraAsc(ordemVenda.getAtivo().getId(), clienteModel.getId());
+        verify(carteiraRepository, times(1)).save(carteiraModel);
+    }
+
+    @Test
+    void removerPapeisCarteiraErro() {
+        Set<CarteiraModel> carteiras = new HashSet<>();
+
+        Ordem ordemVenda = new Ordem();
+        ordemVenda.setId(1L);
+        ordemVenda.setQuantidadeAberto(1);
+        ordemVenda.setValorOrdem(11);
+        ordemVenda.setStatusOrdem(enumStatus.ABERTA);
+        ordemVenda.setIdCliente(1L);
+        ordemVenda.setIdAtivo(1L);
+        AtivoModel ativo = mock(AtivoModel.class);
+        ativo.setId(1l);
+        ordemVenda.setAtivo(ativo);
+
+        Operacao operacao = new Operacao();
+        operacao.setQuantidade(2);
+        operacao.setValorAtivoExecucao(10);
+
+        ClienteModel clienteModel = new ClienteModel();
+        clienteModel.setId(1L);
+        clienteModel.setSaldo(1000);
+
+        CarteiraModel carteiraModel = new CarteiraModel();
+        carteiraModel.setId(1L);
+        carteiraModel.setIdAtivo(1L);
+        carteiraModel.setIdCliente(1L);
+        carteiraModel.setQuantidade(1);
+        carteiras.add(carteiraModel);
+
+        when(clienteRepository.findById(ordemVenda.getIdCliente())).thenReturn(Optional.of(clienteModel));
+        when(carteiraRepository.findByIdAtivoAndIdClienteOrderByDataCompraAsc(ordemVenda.getAtivo().getId(), clienteModel.getId())).thenReturn(carteiras);
+
+
+        processamentoService.removerPapeisCarteira(operacao, ordemVenda);
+        verify(carteiraRepository, times(1)).findByIdAtivoAndIdClienteOrderByDataCompraAsc(ordemVenda.getAtivo().getId(), clienteModel.getId());
+        verify(carteiraRepository, times(1)).delete(carteiraModel);
+    }
+
+    @Test
+    void adicionarPapeisCarteira() {
+        ClienteModel clienteModel = new ClienteModel();
+        Ordem ordemCompra = new Ordem();
+        Operacao operacao = new Operacao();
+        AtivoModel ativo = mock(AtivoModel.class);
+
+        clienteModel.setId(1L);
+
+        ordemCompra.setId(1L);
+        ordemCompra.setQuantidadeAberto(1);
+        ordemCompra.setValorOrdem(11);
+        ordemCompra.setStatusOrdem(enumStatus.ABERTA);
+        ordemCompra.setIdCliente(1L);
+        ordemCompra.setIdAtivo(1L);
+        ordemCompra.setCliente(clienteModel);
+        ativo.setId(1l);
+        ordemCompra.setAtivo(ativo);
+
+        operacao.setQuantidade(1);
+        operacao.setValorAtivoExecucao(10);
+        operacao.setDataExecucao(LocalDateTime.now());
+        operacao.setQuantidade(10);
+
+        processamentoService.adicionarPapeisCarteira(operacao, ordemCompra);
+
+        verify(carteiraRepository, times(1)).save(any(CarteiraModel.class));
+    }
+
+    @Test
+    void adicionarPapeisCarteiraClientePresent() {
+        ClienteModel clienteModelFicticio = new ClienteModel();
+        ClienteModel clienteModel = new ClienteModel();
+        Ordem ordemCompra = new Ordem();
+        Operacao operacao = new Operacao();
+        AtivoModel ativo = mock(AtivoModel.class);
+
+        clienteModel.setId(1L);
+
+        ordemCompra.setId(1L);
+        ordemCompra.setQuantidadeAberto(1);
+        ordemCompra.setValorOrdem(11);
+        ordemCompra.setStatusOrdem(enumStatus.ABERTA);
+        ordemCompra.setIdCliente(1L);
+        ordemCompra.setIdAtivo(1L);
+        ordemCompra.setCliente(clienteModel);
+        ativo.setId(1l);
+        ordemCompra.setAtivo(ativo);
+
+        operacao.setQuantidade(1);
+        operacao.setValorAtivoExecucao(10);
+        operacao.setDataExecucao(LocalDateTime.now());
+        operacao.setQuantidade(10);
+        when(clienteRepository.findById(1L)).thenReturn(Optional.of(clienteModelFicticio));
+
+        processamentoService.adicionarPapeisCarteira(operacao, ordemCompra);
+
+        verify(carteiraRepository, times(1)).save(any(CarteiraModel.class));
     }
 }

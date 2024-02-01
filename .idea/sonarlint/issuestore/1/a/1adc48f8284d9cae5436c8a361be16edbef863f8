@@ -1,9 +1,0 @@
-
-v
-java:S3655Y"TCall "ordemVenda.isPresent()" or "!ordemVenda.isEmpty()" before accessing the value.(ÚãÓøÿÿÿÿ8ö˜ÚÓÕ1
-s
-java:S3655"VCall "ordemCompra.isPresent()" or "!ordemCompra.isEmpty()" before accessing the value.(šˆ’ì8õ˜ÚÓÕ1
-t
-java:S3776"RRefactor this method to reduce its Cognitive Complexity from 33 to the 15 allowed.( î†úÿÿÿÿ8ú˜ÚÓÕ1
-t
-java:S3776U"RRefactor this method to reduce its Cognitive Complexity from 33 to the 15 allowed.(¾¾¹ÿÿÿÿÿ8„™ÚÓÕ1
